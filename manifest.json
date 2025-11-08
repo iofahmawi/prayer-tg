@@ -4,8 +4,8 @@
     "description": "مولد مواقت الصلاة.",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#FFFFFF",
-    "theme_color": "#4f46e5",
+    "background_color": "#eff6ff",
+    "theme_color": "#eff6ff",
     "icons": [
         {
             "src": "icon-1024.png",
