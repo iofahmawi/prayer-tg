@@ -1,0 +1,16 @@
+{
+    "name": "مولد مواقيت الصلاة",
+    "short_name": "مواقيت الصلاة",
+    "description": "مولد مواقت الصلاة.",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#FFFFFF",
+    "theme_color": "#4f46e5",
+    "icons": [
+        {
+            "src": "icon-1024.png",
+            "sizes": "1024x1024",
+            "type": "image/png"
+        }
+    ]
+}
