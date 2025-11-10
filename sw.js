@@ -1,6 +1,6 @@
 // sw.js
 
-const CACHE_NAME = 'prayer-times-generator-v3';
+const CACHE_NAME = 'prayer-times-generator-v4';
 const urlsToCache = [
   '/',
   'index.html',
