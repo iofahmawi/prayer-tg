@@ -31,20 +31,8 @@
 
   <!-- 5. وضع كود React هنا مع تحديد النوع "text/babel" -->
   <script type="text/babel">
-    const { useState, useRef } = React;
+    const { useState, useRef, useEffect } = React;
 
-    const governorateSettings = {
-      amman: { displayName: "عمّان", lat: "31.955", lon: "35.945", tz: "3", fajrDep: "18.05", ishaDep: "18.11", asrShadow: "1", offsets: { fajr: "0", sunrise: "-6.64", dhuhr: "0.45", asr: "0", maghrib: "6.84", isha: "0" } },
-      zarqa: { displayName: "الزرقاء", lat: "32.083", lon: "36.089", tz: "3", fajrDep: "18.05", ishaDep: "18.11", asrShadow: "1", offsets: { fajr: "0.38", sunrise: "-6.36", dhuhr: "0.92", asr: "0.93", maghrib: "7.69", isha: "0.70" } },
-      irbid: { displayName: "إربد", lat: "32.556", lon: "35.844", tz: "3", fajrDep: "18.05", ishaDep: "18.11", asrShadow: "1", offsets: { fajr: "-0.47", sunrise: "-5.64", dhuhr: "0.19", asr: "0", maghrib: "6.14", isha: "-0.21" } },
-      ajloun: { displayName: "عجلون و جرش", lat: "32.332", lon: "35.751", tz: "3", fajrDep: "18.05", ishaDep: "18.11", asrShadow: "1", offsets: { fajr: "-2.31", sunrise: "-7.68", dhuhr: "-1.71", asr: "-2.03", maghrib: "4.39", isha: "-2.16" } },
-      mafraq: { displayName: "المفرق", lat: "32.341", lon: "36.203", tz: "3", fajrDep: "18.05", ishaDep: "18.11", asrShadow: "1", offsets: { fajr: "0.50", sunrise: "-6.52", dhuhr: "1.37", asr: "1.93", maghrib: "8.75", isha: "1.49" } },
-      karak: { displayName: "الكرك", lat: "31.181", lon: "35.762", tz: "3", fajrDep: "18.05", ishaDep: "18.11", asrShadow: "1", offsets: { fajr: "0.12", sunrise: "-6.99", dhuhr: "0.18", asr: "0.05", maghrib: "7.44", isha: "-0.06" } },
-      tafilah: { displayName: "الطفيلة", lat: "30.835", lon: "35.604", tz: "3", fajrDep: "18.05", ishaDep: "18.11", asrShadow: "1", offsets: { fajr: "-0.067", sunrise: "-8.01", dhuhr: "-0.03", asr: "-0.16", maghrib: "8.01", isha: "-0.37" } },
-      maan: { displayName: "معان", lat: "30.195", lon: "35.734", tz: "3", fajrDep: "18.05", ishaDep: "18.11", asrShadow: "1", offsets: { fajr: "0.16", sunrise: "-6.42", dhuhr: "-0.07", asr: "-0.18", maghrib: "6.57", isha: "-0.39" } },
-      aqaba: { displayName: "العقبة", lat: "29.527", lon: "35.008", tz: "3", fajrDep: "18.05", ishaDep: "18.11", asrShadow: "1", offsets: { fajr: "0.12", sunrise: "-2.63", dhuhr: "-0.09", asr: "-0.18", maghrib: "2.65", isha: "-0.35" } }
-    };
-    
     // ====================================================================
     // Prayer Time Calculation Engine (No changes here)
     // ====================================================================
@@ -66,6 +54,42 @@
       const [isCityModalOpen, setIsCityModalOpen] = useState(false);
       const [params, setParams] = useState(null);
       const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+      const [governorateSettings, setGovernorateSettings] = useState({});
+
+      const cityFiles = [
+        'settings-amman.json', 'settings-zarqa.json', 'settings-balqa.json',
+        'settings-madaba.json', 'settings-irbid.json', 'settings-mafraq.json',
+        'settings-ajloun.json', 'settings-jerash.json', 'settings-karak.json',
+        'settings-tafilah.json', "settings-ma'an.json", 'settings-aqaba.json'
+      ];
+
+      const nameMapping = {
+        'amman': 'عمّان', 'zarqa': 'الزرقاء', 'balqa': 'البلقاء', 'madaba': 'مأدبا',
+        'irbid': 'إربد', 'mafraq': 'المفرق', 'ajloun': 'عجلون', 'jerash': 'جرش',
+        'karak': 'الكرك', 'tafilah': 'الطفيلة', "ma'an": 'معان', 'aqaba': 'العقبة'
+      };
+
+      useEffect(() => {
+        const fetchSettings = async () => {
+          const settings = {};
+          for (const file of cityFiles) {
+            try {
+              const response = await fetch(`https://iofahmawi.github.io/prayer-tg/${file}`);
+              if (!response.ok) throw new Error(`Could not fetch ${file}`);
+              const data = await response.json();
+              const key = file.replace('settings-', '').replace('.json', '');
+              settings[key] = {
+                ...data,
+                displayName: nameMapping[key] || key
+              };
+            } catch (error) {
+              console.error("Failed to load settings file:", file, error);
+            }
+          }
+          setGovernorateSettings(settings);
+        };
+        fetchSettings();
+      }, []);
       
       const generateYearData = (targetYear, customParams) => {
         if (!targetYear || isNaN(targetYear)) return;
@@ -159,8 +183,21 @@
       };
 
       const handleCitySelect = (cityKey) => {
-        const selectedSettings = governorateSettings[cityKey];
-        if (!selectedSettings) return;
+        const imported = governorateSettings[cityKey];
+        if (!imported) return;
+
+        const selectedSettings = {
+          displayName: imported.displayName,
+          lat: imported.lat, lon: imported.lon, tz: imported.tz,
+          fajrDep: imported.fajrDep, ishaDep: imported.ishaDep,
+          asrShadow: imported.asrShadow,
+          offsets: {
+            fajr: imported.fajrOffset, sunrise: imported.sunriseOffset,
+            dhuhr: imported.dhuhrOffset, asr: imported.asrOffset,
+            maghrib: imported.magOffset, isha: imported.ishaOffset
+          }
+        };
+        
         setParams(selectedSettings);
         generateYearData(parseInt(year), selectedSettings);
         setIsCityModalOpen(false);
@@ -179,7 +216,7 @@
                   <input type="number" value={year} onChange={(e) => setYear(e.target.value)} min="1900" max="2100" className="w-full p-4 text-2xl text-center border-2 border-indigo-300 rounded-xl focus:border-indigo-600 focus:outline-none font-bold" placeholder="مثال: 2025" />
               </div>
               <div className="flex flex-col gap-4 max-w-lg mx-auto">
-                <button onClick={() => setIsCityModalOpen(true)} disabled={loading} className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg transition-all">{loading ? '⏳ جاري الحساب...' : '🚀 توليد مواقيت الصلاة'}</button>
+                <button onClick={() => setIsCityModalOpen(true)} disabled={loading || Object.keys(governorateSettings).length === 0} className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg transition-all">{loading ? '⏳ جاري الحساب...' : (Object.keys(governorateSettings).length === 0 ? 'جاري تحميل الإعدادات...' : '🚀 توليد مواقيت الصلاة')}</button>
                 <button onClick={handleImportClick} className="w-full bg-gradient-to-r from-gray-600 to-gray-800 text-white px-8 py-4 rounded-xl font-bold text-lg hover:from-gray-700 hover:to-gray-900 shadow-lg transition-all">📥 استيراد ملف معايرة</button>
                 <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".json" style={{ display: 'none' }} />
                 {generatedData && (<button onClick={() => setIsExportModalOpen(true)} className="w-full bg-gradient-to-r from-green-600 to-teal-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:from-green-700 hover:to-teal-700 shadow-lg transition-all">⬇️ تصدير البيانات</button>)}
@@ -188,7 +225,7 @@
             
             {params && generatedData && (
               <div className="bg-white rounded-3xl shadow-2xl p-8 mb-8">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">⚙️ إعدادات المعايرة الحالية</h2>
+                <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">⚙️ إعدادات المعايرة الحالية: {params.displayName}</h2>
                 <div className="mb-6"><h3 className="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">المعلمات الأساسية</h3><div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-center"><div className="bg-indigo-50 p-3 rounded-lg"><p className="text-sm text-indigo-800 font-bold">خط العرض</p><p className="text-lg font-mono">{params.lat}°</p></div><div className="bg-indigo-50 p-3 rounded-lg"><p className="text-sm text-indigo-800 font-bold">خط الطول</p><p className="text-lg font-mono">{params.lon}°</p></div><div className="bg-indigo-50 p-3 rounded-lg"><p className="text-sm text-indigo-800 font-bold">المنطقة الزمنية</p><p className="text-lg font-mono">UTC+{params.tz}</p></div><div className="bg-indigo-50 p-3 rounded-lg"><p className="text-sm text-indigo-800 font-bold">زاوية الفجر</p><p className="text-lg font-mono">{params.fajrDep}°</p></div><div className="bg-indigo-50 p-3 rounded-lg"><p className="text-sm text-indigo-800 font-bold">زاوية العشاء</p><p className="text-lg font-mono">{params.ishaDep}°</p></div><div className="bg-indigo-50 p-3 rounded-lg"><p className="text-sm text-indigo-800 font-bold">معامل العصر</p><p className="text-lg font-mono">{params.asrShadow}</p></div></div></div>
                 <div><h3 className="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">دقائق التعويض (Offsets)</h3><div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-center"><div className="bg-green-50 p-3 rounded-lg"><p className="text-sm text-green-800 font-bold">الفجر</p><p className="text-lg font-mono">{params.offsets.fajr} د</p></div><div className="bg-green-50 p-3 rounded-lg"><p className="text-sm text-green-800 font-bold">الشروق</p><p className="text-lg font-mono">{params.offsets.sunrise} د</p></div><div className="bg-green-50 p-3 rounded-lg"><p className="text-sm text-green-800 font-bold">الظهر</p><p className="text-lg font-mono">{params.offsets.dhuhr} د</p></div><div className="bg-green-50 p-3 rounded-lg"><p className="text-sm text-green-800 font-bold">العصر</p><p className="text-lg font-mono">{params.offsets.asr} د</p></div><div className="bg-green-50 p-3 rounded-lg"><p className="text-sm text-green-800 font-bold">المغرب</p><p className="text-lg font-mono">{params.offsets.maghrib} د</p></div><div className="bg-green-50 p-3 rounded-lg"><p className="text-sm text-green-800 font-bold">العشاء</p><p className="text-lg font-mono">{params.offsets.isha} د</p></div></div></div>
               </div>
