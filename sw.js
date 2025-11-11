@@ -1,7 +1,9 @@
 // sw.js
 
-// 1. قم بزيادة رقم الإصدار. هذا أمر ضروري لتفعيل التغييرات.
-const CACHE_NAME = 'prayer-times-generator-v6'; 
+// 1. تم تحديث إصدار الكاش إلى v6 لتفعيل التغييرات
+const CACHE_NAME = 'prayer-times-generator-v6';
+
+// الأصول الأساسية للتطبيق التي سيتم تخزينها دائماً
 const urlsToCache = [
   '/',
   'index.html',
@@ -24,7 +26,7 @@ self.addEventListener('install', event => {
   );
 });
 
-// حدث التفعيل: يتم حذف ملفات الكاش القديمة
+// حدث التفعيل: يتم حذف ملفات الكاش القديمة لضمان استخدام النسخة الجديدة فقط
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -41,17 +43,17 @@ self.addEventListener('activate', event => {
   return self.clients.claim();
 });
 
-// حدث الجلب: يتم اعتراض طلبات الشبكة
+// حدث الجلب: يتم اعتراض طلبات الشبكة لتطبيق استراتيجيات التخزين المؤقت
 self.addEventListener('fetch', event => {
   const { request } = event;
 
-  // استراتيجية خاصة لملفات الإعدادات (JSON)
-  // Network First, falling back to Cache
-  if (request.url.includes('iofahmawi.github.io/prayer-tg/')) {
+  // 2. تم تحديث الشرط ليكون أكثر دقة ويستهدف ملفات الإعدادات في مجلدها الجديد
+  // استراتيجية خاصة لملفات الإعدادات (JSON) -> "الشبكة أولاً، ثم الكاش كبديل"
+  if (request.url.includes('/settings/')) {
     event.respondWith(
       fetch(request)
         .then(networkResponse => {
-          // إذا نجح الطلب من الشبكة، نقوم بتخزين نسخة في الكاش
+          // إذا نجح الطلب من الشبكة، نقوم بتخزين نسخة محدثة في الكاش
           const responseClone = networkResponse.clone();
           caches.open(CACHE_NAME)
             .then(cache => {
@@ -60,15 +62,15 @@ self.addEventListener('fetch', event => {
           return networkResponse;
         })
         .catch(() => {
-          // إذا فشل الطلب من الشبكة (مثل عدم وجود اتصال)، نبحث في الكاش
+          // إذا فشل الطلب من الشبكة (مثل عدم وجود اتصال)، نبحث في الكاش عن نسخة قديمة
+          console.log('Network request failed. Serving from cache:', request.url);
           return caches.match(request);
         })
     );
-    return;
+    return; // إنهاء التنفيذ هنا لهذه الطلبات
   }
 
-  // استراتيجية للملفات الأخرى (الأصول الأساسية)
-  // Cache First
+  // استراتيجية للملفات الأخرى (الأصول الأساسية) -> "الكاش أولاً"
   event.respondWith(
     caches.match(request)
       .then(response => {
