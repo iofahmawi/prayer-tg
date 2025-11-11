@@ -1,7 +1,7 @@
 // sw.js
 
-// 1. تم تحديث إصدار الكاش إلى v6 لتفعيل التغييرات
-const CACHE_NAME = 'prayer-times-generator-v6';
+// 1. تم تحديث إصدار الكاش إلى v7 لتفعيل التغييرات
+const CACHE_NAME = 'prayer-times-generator-v7';
 
 // الأصول الأساسية للتطبيق التي سيتم تخزينها دائماً
 const urlsToCache = [
