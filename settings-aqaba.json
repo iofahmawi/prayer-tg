@@ -1,0 +1,15 @@
+{
+  "year": "2025",
+  "lat": "29.5321",
+  "lon": "35.0063",
+  "tz": "3",
+  "fajrDep": "18.05",
+  "ishaDep": "18.11",
+  "asrShadow": "1",
+  "fajrOffset": "0.12",
+  "sunriseOffset": "-2.65",
+  "dhuhrOffset": "-0.10",
+  "asrOffset": "-0.18",
+  "magOffset": "2.65",
+  "ishaOffset": "-0.35"
+}
