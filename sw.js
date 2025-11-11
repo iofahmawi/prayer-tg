@@ -1,7 +1,7 @@
 // sw.js
 
 // 1. قم بزيادة رقم الإصدار. هذا أمر ضروري لتفعيل التغييرات.
-const CACHE_NAME = 'prayer-times-generator-v5'; 
+const CACHE_NAME = 'prayer-times-generator-v6'; 
 const urlsToCache = [
   '/',
   'index.html',
