@@ -14,7 +14,7 @@ const urlsToCache = [
   'https://unpkg.com/@babel/standalone/babel.min.js',
   'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js',
   // 2. تم إضافة رابط الخط الجديد ليتم تخزينه في الكاش
-  'https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700&display=swap' // <--- تم التغيير هنا
+  'https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&display=swap' // <--- تم التغيير هنا
 ];
 
 // حدث التثبيت: يتم تخزين الأصول الأساسية للتطبيق
