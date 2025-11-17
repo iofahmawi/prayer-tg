@@ -3,13 +3,13 @@
   "lat": "31.9544",
   "lon": "35.9106",
   "tz": "3",
-  "fajrDep": "17.40",
-  "ishaDep": "18",
+  "fajrDep": "18.10",
+  "ishaDep": "18.10",
   "asrShadow": "1",
-  "fajrOffset": "-3.42",
+  "fajrOffset": "0",
   "sunriseOffset": "-6.85",
-  "dhuhrOffset": "0.20",
-  "asrOffset": "0",
+  "dhuhrOffset": "0.35",
+  "asrOffset": "-0.05",
   "magOffset": "6.68",
-  "ishaOffset": "0.42"
+  "ishaOffset": "0"
 }
