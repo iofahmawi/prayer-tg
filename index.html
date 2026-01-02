@@ -76,7 +76,7 @@
     function calculateYearPrayerTimes(Y,params){const{lat,lon,tz,fajrDep,ishaDep,asrShadow,offsets}=params;const rows=[];const isLeapYear=(Y%4===0&&Y%100!==0)||(Y%400===0);const daysInYear=isLeapYear?366:365;for(let dayOfYear=1;dayOfYear<=daysInYear;dayOfYear++){const date=new Date(Y,0,dayOfYear);const month=date.getMonth()+1;const day=date.getDate();const solarNoonUTCmin=720-4*lon-sunCoords(julianDay(Y,month,day)+.5).EoT;const fajrMinutes=eventLocalMinutes(Y,month,day,90+Number(fajrDep),lat,lon,tz,true)+Number(offsets.fajr);const sunriseMinutes=eventLocalMinutes(Y,month,day,90.833,lat,lon,tz,true)+Number(offsets.sunrise);const dhuhrMinutes=solarNoonUTCmin+(tz*60)+Number(offsets.dhuhr);const asrMinutes=asrLocalMinutes(Y,month,day,Number(asrShadow),lat,lon,tz)+Number(offsets.asr);const maghribMinutes=eventLocalMinutes(Y,month,day,90.833,lat,lon,tz,false)+Number(offsets.maghrib);const ishaMinutes=eventLocalMinutes(Y,month,day,90+Number(ishaDep),lat,lon,tz,false)+Number(offsets.isha);rows.push({date:`${Y}-${pad(month)}-${pad(day)}`,fajr:formatPrayerTime(fajrMinutes,'fajr'),sunrise:formatPrayerTime(sunriseMinutes,'sunrise'),dhuhr:formatPrayerTime(dhuhrMinutes,'dhuhr'),asr:formatPrayerTime(asrMinutes,'asr'),maghrib:formatPrayerTime(maghribMinutes,'maghrib'),isha:formatPrayerTime(ishaMinutes,'isha')})}return rows}
 
     const PrayerTimesGenerator = () => {
-      const [year, setYear] = useState('2025');
+      const [year, setYear] = useState('2026');
       const [loading, setLoading] = useState(false);
       const [generatedData, setGeneratedData] = useState(null);
       const fileInputRef = useRef(null);
